@@ -1,0 +1,47 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("user_details")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  UserID       Int       @id @default(autoincrement())
+  Name         String
+  Email        String    @unique
+  Mobile       String?
+  Salt         String
+  PasswordHash String
+  role         Role      @relation(fields: [RoleID], references: [RoleID])
+  RoleID       Int
+  CreatedAt    DateTime  @default(now())
+  ServiceRequests ServiceRequest[]
+  AuditLogs     AuditLog[]
+}
+
+model Role {
+  RoleID   Int     @id @default(autoincrement())
+  RoleName String  @unique
+  users    User[]
+}
+
+model ServiceRequest {
+  RequestID   Int      @id @default(autoincrement())
+  User         User    @relation(fields: [UserID], references: [UserID])
+  UserID       Int
+  ServiceType String
+  Description String
+  FeeAmount   Float
+  Status      String
+  CreatedAt   DateTime @default(now())
+}
+
+model AuditLog {
+  LogID     Int      @id @default(autoincrement())
+  User      User     @relation(fields: [UserID], references: [UserID])
+  UserID    Int
+  Action    String
+  Timestamp DateTime @default(now())
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GovTech Simulation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #083173;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      #container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 320px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      form {
+        display: none;
+        flex-direction: column;
+      }
+      form.active {
+        display: flex;
+      }
+      label {
+        margin: 0.5rem 0 0.2rem;
+      }
+      input {
+        padding: 0.5rem;
+        font-size: 1rem;
+      }
+      button {
+        margin-top: 1rem;
+        padding: 0.6rem;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .toggle {
+        text-align: center;
+        margin-top: 1rem;
+      }
+      .toggle a {
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      #message {
+        margin-top: 1rem;
+        color: red;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="message"></div>
+
+      <form id="loginForm" class="active">
+        <h2>Login</h2>
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" required />
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" required />
+        <button onclick="window.location.href='home.html'" type="submit">
+          Log In
+        </button>
+        <div class="toggle">
+          Don’t have an account? <a id="showRegister">Register</a>
+        </div>
+      </form>
+
+      <form id="registerForm">
+        <h2>Register</h2>
+        <label for="regEmail">Email</label>
+        <input id="regEmail" type="email" required />
+        <label for="regPassword">Password</label>
+        <input id="regPassword" type="password" required minlength="8" />
+        <button type="submit">Sign Up</button>
+        <div class="toggle">Already have one? <a id="showLogin">Log In</a></div>
+      </form>
+    </div>
+
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const messageDiv = document.getElementById("message");
+
+      // Toggle forms
+      document.getElementById("showRegister").onclick = () => {
+        loginForm.classList.remove("active");
+        registerForm.classList.add("active");
+        messageDiv.textContent = "";
+      };
+      document.getElementById("showLogin").onclick = () => {
+        registerForm.classList.remove("active");
+        loginForm.classList.add("active");
+        messageDiv.textContent = "";
+      };
+
+      // Helper: show error/success
+      function showMessage(msg, isError = true) {
+        messageDiv.textContent = msg;
+        messageDiv.style.color = isError ? "red" : "green";
+      }
+
+      // Login submission
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            credentials: "include", // send/receive httpOnly refresh cookie
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Login failed");
+
+          // Store the access token
+          localStorage.setItem("accessToken", data.accessToken);
+          showMessage("Login successful!", false);
+          // Redirect to dashboard
+          setTimeout(() => (location.href = "/dashboard.html"), 1000);
+        } catch (err) {
+          showMessage(err.message);
+        }
+      });
+
+      // Register submission
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPassword").value;
+
+        try {
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Registration failed");
+
+          showMessage("Registration successful! You can now log in.", false);
+          // Switch to login form
+          document.getElementById("showLogin").click();
+        } catch (err) {
+          showMessage(err.message);
+        }
+      });
+    </script>
+  </body>
+</html>
