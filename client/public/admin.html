@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background: url('./Kerala_Government_Secretariat.jpg');background-size: cover;}
+    header, footer { background:#005ea2; color:#fff; padding:1rem; text-align:center; }
+    main { padding:1rem; max-width:1000px; margin:0 auto; }
+    section { margin-bottom:2rem; }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:4px;
+      overflow:hidden;
+    }
+    table th, table td {
+      padding:0.5rem;
+      border-bottom:1px solid #eee;
+      text-align:left;
+    }
+    select { padding:0.2rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
+
+  <main>
+    <!-- User Management -->
+    <section>
+      <h2>User Management</h2>
+      <table id="usersTable">
+        <thead>
+          <tr><th>UserID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <!-- Dummy user rows -->
+          <tr>
+            <td>101</td>
+            <td>Alice Johnson</td>
+            <td>alice@example.com</td>
+            <td>
+              <select data-id="101">
+                <option value="1" selected>Admin</option>
+                <option value="2">Editor</option>
+                <option value="3">Viewer</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>102</td>
+            <td>Bob Kumar</td>
+            <td>bob@example.com</td>
+            <td>
+              <select data-id="102">
+                <option value="1">Admin</option>
+                <option value="2" selected>Editor</option>
+                <option value="3">Viewer</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Audit Logs -->
+    <section>
+      <h2>Audit Logs</h2>
+      <table id="auditTable">
+        <thead>
+          <tr><th>LogID</th><th>UserID</th><th>Action</th><th>Timestamp</th></tr>
+        </thead>
+        <tbody>
+          <!-- Dummy audit log rows -->
+          <tr>
+            <td>1</td>
+            <td>101</td>
+            <td>Created user Bob Kumar</td>
+            <td>2025-08-26 10:15:23</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>102</td>
+            <td>Approved request #5</td>
+            <td>2025-08-27 14:42:10</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>© 2025 GovTech Simulation</footer>
+</body>
+</html>

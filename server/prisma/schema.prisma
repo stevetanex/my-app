@@ -45,3 +45,24 @@ model AuditLog {
   Action    String
   Timestamp DateTime @default(now())
 }
+
+model PaymentTransaction {
+  TransactionID    String    @id @default(uuid())
+  User             User      @relation(fields: [UserID], references: [UserID])
+  UserID           Int
+  Request          ServiceRequest @relation(fields: [RequestID], references: [RequestID])
+  RequestID        Int
+  Amount           Float
+  Currency         String
+  OrderId          String
+  PaymentId        String    @unique
+  Status           String    // Pending | Success | Failed | Refunded
+  Signature        String?
+  GatewayResponse  Json
+  IdempotencyKey   String    @unique
+  CreatedAt        DateTime  @default(now())
+  UpdatedAt        DateTime  @updatedAt
+
+  @@index([OrderId])
+  @@index([Status])
+}

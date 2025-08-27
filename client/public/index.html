@@ -39,6 +39,20 @@
         padding: 0.5rem;
         font-size: 1rem;
       }
+      /* New forgot-password link styling */
+      .forgot {
+        text-align: right;
+        margin: 0.25rem 0 0.75rem;
+      }
+      .forgot a {
+        font-size: 0.9rem;
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .forgot a:hover {
+        text-decoration: underline;
+      }
       button {
         margin-top: 1rem;
         padding: 0.6rem;
@@ -65,28 +79,41 @@
     <div id="container">
       <div id="message"></div>
 
+      <!-- LOGIN FORM -->
       <form id="loginForm" class="active">
         <h2>Login</h2>
+
         <label for="loginEmail">Email</label>
         <input id="loginEmail" type="email" required />
+
         <label for="loginPassword">Password</label>
         <input id="loginPassword" type="password" required />
-        <button onclick="window.location.href='home.html'" type="submit">
-          Log In
-        </button>
+
+        <!-- Forgot password link -->
+        <div class="forgot">
+          <a href="forgot.html">Forgot Password?</a>
+        </div>
+
+        <button type="submit">Log In</button>
         <div class="toggle">
           Don’t have an account? <a id="showRegister">Register</a>
         </div>
       </form>
 
+      <!-- REGISTER FORM -->
       <form id="registerForm">
         <h2>Register</h2>
+
         <label for="regEmail">Email</label>
         <input id="regEmail" type="email" required />
+
         <label for="regPassword">Password</label>
         <input id="regPassword" type="password" required minlength="8" />
+
         <button type="submit">Sign Up</button>
-        <div class="toggle">Already have one? <a id="showLogin">Log In</a></div>
+        <div class="toggle">
+          Already have one? <a id="showLogin">Log In</a>
+        </div>
       </form>
     </div>
 
@@ -122,18 +149,16 @@
         try {
           const res = await fetch("/api/auth/login", {
             method: "POST",
-            credentials: "include", // send/receive httpOnly refresh cookie
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.message || "Login failed");
 
-          // Store the access token
           localStorage.setItem("accessToken", data.accessToken);
           showMessage("Login successful!", false);
-          // Redirect to dashboard
-          setTimeout(() => (location.href = "/dashboard.html"), 1000);
+          setTimeout(() => (location.href = "home.html"), 1000);
         } catch (err) {
           showMessage(err.message);
         }
@@ -155,7 +180,6 @@
           if (!res.ok) throw new Error(data.message || "Registration failed");
 
           showMessage("Registration successful! You can now log in.", false);
-          // Switch to login form
           document.getElementById("showLogin").click();
         } catch (err) {
           showMessage(err.message);

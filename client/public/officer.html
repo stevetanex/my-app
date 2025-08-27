@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Officer Dashboard</title>
+  <style>
+    /* Make the footer stick to the bottom */
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background: url('./Kerala_Government_Secretariat.jpg');
+      background-size: cover;
+    }
+
+    header {
+      background: #005ea2;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    main {
+      flex: 1;               /* take up all available vertical space */
+      padding: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    table th,
+    table td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    input.note {
+      width: 100px;
+      padding: 0.3rem;
+    }
+
+    /* Approve button = green */
+    button.approve,
+    button[data-act="Approved"] {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+    }
+    button.approve:hover {
+      background-color: #218838;
+    }
+
+    /* Reject button = red */
+    button.reject,
+    button[data-act="Rejected"] {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+    }
+    button.reject:hover {
+      background-color: #c82333;
+    }
+
+    footer {
+      background: #005ea2;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Officer Dashboard</h1>
+  </header>
+
+  <main>
+    <h2>All Service Requests</h2>
+    <table id="allRequests">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>UserID</th>
+          <th>Service</th>
+          <th>Description</th>
+          <th>Fee</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dummy row 1 -->
+        <tr>
+          <td>1</td>
+          <td>101</td>
+          <td>Water Connection</td>
+          <td>Leaking kitchen pipe</td>
+          <td>50</td>
+          <td>Pending</td>
+          <td>
+            <input class="note" placeholder="note" />
+            <button class="approve" data-id="1" data-act="Approved">Approve</button>
+            <button class="reject" data-id="1" data-act="Rejected">Reject</button>
+          </td>
+        </tr>
+        <!-- Dummy row 2 -->
+        <tr>
+          <td>2</td>
+          <td>102</td>
+          <td>Electricity Bill Issue</td>
+          <td>Overcharged last month</td>
+          <td>20</td>
+          <td>Pending</td>
+          <td>
+            <input class="note" placeholder="note" />
+            <button class="approve" data-id="2" data-act="Approved">Approve</button>
+            <button class="reject" data-id="2" data-act="Rejected">Reject</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+    © 2025 GovTech Simulation
+  </footer>
+</body>
+</html>

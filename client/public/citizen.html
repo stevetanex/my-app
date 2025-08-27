@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Citizen Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background: url('./Kerala_Government_Secretariat.jpg');background-size: cover;}
+    header, footer { background:#005ea2; color:#f4ecec; padding:1rem; text-align:center; }
+    main { padding:1rem; max-width:800px; margin:0 auto; }
+    #userInfo {
+      background:#8b9ea9;
+      border:1px solid #99ccee;
+      border-radius:4px;
+      padding:0.75rem 1rem;
+      margin-bottom:1.5rem;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+    }
+    #userInfo div { font-size:0.95rem; }
+    form, table {
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:4px;
+      padding:1rem;
+      margin-bottom:2rem;
+    }
+    form label { display:block; margin:0.5rem 0 0.2rem; }
+    form input, form select, form textarea { width:100%; padding:0.5rem; }
+    form button { margin-top:1rem; padding:0.6rem 1rem; background:#005ea2; color:#fff; border:none; cursor:pointer; }
+    table { width:100%; border-collapse:collapse; }
+    table th, table td { padding:0.5rem; border:1px solid #eee; text-align:left; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Citizen Dashboard</h1>
+  </header>
+
+  <main>
+    <!-- User Info -->
+    <div id="userInfo">
+      <div>ID: <strong><span id="userId">--</span></strong></div>
+      <div>Name: <strong><span id="userName">client@gmail.com</span></strong></div>
+      <div>Pending Dues: <strong>$<span id="pendingDues">0.00</span></strong></div>
+    </div>
+
+    <!-- Create Request -->
+    <form id="requestForm">
+      <h2>New Service Request</h2>
+      <label for="serviceType">Service Type</label>
+      <select id="serviceType" required>
+        <option value="">Select type</option>
+        <option>Water Connection</option>
+        <option>Electricity Bill Issue</option>
+        <option>Garbage Collection</option>
+      </select>
+
+      <label for="description">Description</label>
+      <textarea id="description" rows="3" required></textarea>
+
+      <label for="feeAmount">Fee Amount</label>
+      <input id="feeAmount" type="number" placeholder="(auto-calculated)" disabled />
+
+      <button type="submit">Submit Request</button>
+    </form>
+
+    <!-- My Requests -->
+    <section>
+      <h2>My Requests</h2>
+      <table id="requestsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Service</th>
+            <th>Description</th>
+            <th>Fee</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows injected here -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>© 2025 GovTech Simulation</footer>
+
+  <script>
+    // Helper to decode JWT
+    function parseJwt(token) {
+      try {
+        const b = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+        return JSON.parse(atob(b));
+      } catch {
+        return {};
+      }
+    }
+
+    // Populate feeAmount placeholder based on serviceType
+    document.getElementById('serviceType').addEventListener('change', e => {
+      const fees = {
+        'Water Connection': 50,
+        'Electricity Bill Issue': 20,
+        'Garbage Collection': 30
+      };
+      document.getElementById('feeAmount').value = fees[e.target.value] || '';
+    });
+
+    // Submit new request
+    document.getElementById('requestForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = {
+        serviceType: e.target.serviceType.value,
+        description: e.target.description.value,
+        feeAmount: parseFloat(e.target.feeAmount.value)
+      };
+      await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+        },
+        body: JSON.stringify(body)
+      });
+      loadMyRequests();
+      e.target.reset();
+    });
+
+    // Load my requests and update user info
+    async function loadMyRequests() {
+      // Decode user info
+      const token = localStorage.getItem('accessToken');
+      const payload = parseJwt(token);
+      document.getElementById('userId').textContent = payload.sub || payload.UserID || '—';
+      document.getElementById('userName').textContent = payload.name || payload.email || '—';
+
+      // Fetch requests
+      const res = await fetch('/api/requests/my', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      const tbody = document.querySelector('#requestsTable tbody');
+      tbody.innerHTML = '';
+
+      // Calculate pending dues
+      let pendingSum = 0;
+
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.RequestID}</td>
+          <td>${r.ServiceType}</td>
+          <td>${r.Description}</td>
+          <td>$${r.FeeAmount.toFixed(2)}</td>
+          <td>${r.Status}</td>
+          <td>${new Date(r.CreatedAt).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+
+        if (r.Status.toLowerCase() === 'pending') {
+          pendingSum += r.FeeAmount;
+        }
+      });
+
+      document.getElementById('pendingDues').textContent = pendingSum.toFixed(2);
+    }
+
+    // Initial load
+    loadMyRequests();
+  </script>
+</body>
+</html>

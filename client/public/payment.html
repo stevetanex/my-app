@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Make a Payment</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; max-width: 400px; margin:auto; }
+    label, input, button { display: block; width: 100%; margin-bottom: 0.75rem; }
+    input { padding: 0.5rem; }
+    button { padding: 0.6rem; background: #005ea2; color: #fff; border:none; cursor:pointer; }
+  </style>
+  <!-- Razorpay Checkout script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <h1>Razorpay Sandbox Demo</h1>
+
+  <label for="amount">Amount (INR)</label>
+  <input id="amount" type="number" step="0.01" value="100" />
+
+  <label for="receipt">Receipt Identifier</label>
+  <input id="receipt" type="text" value="rcptid_11" />
+
+  <button id="payBtn">Pay Now</button>
+
+  <script>
+    document.getElementById('payBtn').onclick = async () => {
+      const amount   = parseFloat(document.getElementById('amount').value);
+      const receipt  = document.getElementById('receipt').value.trim();
+      if (!amount || !receipt) return alert('Enter amount & receipt');
+
+      // 1. Create an order on your server
+      const res = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, currency: 'INR', receipt })
+      });
+      const { order } = await res.json();
+
+      // 2. Configure checkout options
+      const options = {
+        key: 'RAZORPAY_KEY_ID',        // RAZORPAY_KEY_ID from your .env
+        amount: order.amount,          // in paise
+        currency: order.currency,
+        order_id: order.id,            // razorpay order id
+        name: 'GovTech Simulation',
+        description: 'Service Fee Payment',
+        theme: { color: '#005ea2' },
+        handler: function (response) {
+          // 3. On payment success, response contains:
+          //    razorpay_payment_id, razorpay_order_id, razorpay_signature
+          alert('✔️ Payment successful: ' + response.razorpay_payment_id);
+          // TODO: call your /api/payments/verify endpoint here
+        },
+        modal: {
+          ondismiss: function() {
+            alert('Payment cancelled');
+          }
+        }
+      };
+
+      // 4. Open Razorpay checkout
+      const rzp = new Razorpay(options);
+      rzp.open();
+    };
+  </script>
+</body>
+</html>
